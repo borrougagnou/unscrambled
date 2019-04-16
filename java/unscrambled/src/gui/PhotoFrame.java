@@ -23,13 +23,10 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,30 +35,36 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
+@SuppressWarnings("serial")
 public class PhotoFrame extends JFrame implements ActionListener
 {
 	private JLabel jlabelphoto = new JLabel("Photo");
 	private JComboBox<String> jcomboboxphoto;
 	private JButton jbouttonTraiter = new JButton("Traiter");
 	private PanelPhoto panelPhoto = new PanelPhoto();
+	private BrowseFile mypath = new BrowseFile();
 	
 	public PhotoFrame()
 	{
+		mypath.setMypath();
+		File f				= new File(mypath.getMypath());
+		String[] imageList	= f.list();
+
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setLayout(new BorderLayout());
+
 		try
 		{
-			this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-			this.setLayout(new BorderLayout());
-			File f = new File("photo");
-			String[] imageList = f.list();
-			jcomboboxphoto = new JComboBox<String>(imageList);
-			String nomPhoto = (String) jcomboboxphoto.getSelectedItem();
-			BufferedImage mypict = ImageIO.read(new File("photo/"+nomPhoto));
+			jcomboboxphoto		 = new JComboBox<String>(imageList);
+			String nomPhoto		 = (String) jcomboboxphoto.getSelectedItem();
+			BufferedImage mypict = ImageIO.read(new File(mypath.getMypath()+"/"+nomPhoto));
 			panelPhoto.setMypict(mypict);
-			
-			JPanel jPanelN = new JPanel();
+
+			JPanel jPanelN		 = new JPanel();
 			jPanelN.setLayout(new FlowLayout());
 			jPanelN.add(jlabelphoto);
 			jPanelN.add(jcomboboxphoto);
@@ -70,12 +73,21 @@ public class PhotoFrame extends JFrame implements ActionListener
 			this.add(panelPhoto, BorderLayout.CENTER);
 			this.setBounds(10, 10, 600, 849);
 			this.setVisible(true);
+
 			jcomboboxphoto.addActionListener(this);
 			jbouttonTraiter.addActionListener(this);
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+					"ERROR: "+ e.getMessage(), "ERROR",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(null,
+					"ERROR: "+ e.getMessage(), "ERROR",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -152,12 +164,14 @@ public class PhotoFrame extends JFrame implements ActionListener
 			try
 			{
 				File fs = null;
-				fs = new File("photo/"+nomPhoto+"_OK.jpg");
+				fs = new File(mypath.getMypath()+"/"+nomPhoto+"_OK.jpg");
 				ImageIO.write(reslt, "jpg", fs);
 			}
 			catch (IOException e1)
 			{
-				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+						"Action error: "+ e1.getMessage(), "ERROR",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else if (e.getSource() == jcomboboxphoto)
@@ -165,13 +179,15 @@ public class PhotoFrame extends JFrame implements ActionListener
 			this.setBounds(10, 10, 600, 849);
 			try
 			{
-				BufferedImage mypict = ImageIO.read(new File("photo/"+nomPhoto));
+				BufferedImage mypict = ImageIO.read(new File(mypath.getMypath()+"/"+nomPhoto));
 				panelPhoto.setMypict(mypict);
 				panelPhoto.repaint();
 			}
 			catch (IOException e1)
 			{
-				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+						"Action error: "+ e1.getMessage(), "ERROR",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

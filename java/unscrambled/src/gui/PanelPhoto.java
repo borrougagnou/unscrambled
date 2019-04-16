@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class PanelPhoto extends JPanel
 {
 	private BufferedImage mypict;
